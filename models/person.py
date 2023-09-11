@@ -7,7 +7,7 @@ from flask import request, jsonify
 
 persons = [
     {"id": 1, "name": "John", "age": 30, "email": "john@example.com"},
-    {"id": 1, "name": "Joe", "age": 20, "email": "joe@example.com"},
+    {"id": 2, "name": "Joe", "age": 20, "email": "joe@example.com"},
 ]
 
 class Person:
@@ -24,14 +24,28 @@ class Person:
         Returns:
             str: person create 
         """
-        data = request.json
-        new_person = {
-            "id": len(persons) + 1,
-            "name": data["name"],
-            "age": data["age"],
-            "email": data["email"]
-        }
-        persons.append(new_person)
+        try:
+            data = request.json
+        except Exception as e:
+            data = None
+        if data is None:
+            error_msg = "Wrong format"
+        if error_msg is None and data.get("email", "") == "":
+            error_msg = "email missin"
+        if error_msg is None and data.get("password", "") == "":
+            error_msg = "Password missing"
+        if error_msg is None:
+            try:
+                new_person = {
+                    "id": len(persons) + 1,
+                    "name": data["name"],
+                    "age": data["age"],
+                "email": data["email"]
+                }
+
+                persons.append(new_person)
+            except Exception as e:
+                error_msg = "Can't create a new User: {}".format(e)
         return jsonify(new_person), 201
     
     def get_person(user_id):
