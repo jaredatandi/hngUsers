@@ -10,7 +10,7 @@ db = mysql.connector.connect(
     host="172.17.0.2",
     user="db_user",
     password="db_password",
-    database="Users"  # Use the same database name as in the Dockerfile
+    database="Users"
 )
 cursor = db.cursor()
 app = Flask(__name__)
@@ -69,14 +69,17 @@ def get_person_by_name(name):
     return jsonify({"message": "Person not found"}), 404
 
 # Endpoint to update details of an existing person by user ID
+@app.route('/api/<string: name>', methods=['PUT'])
 @app.route('/api/<int:user_id>', methods=['PUT'])
-def update_person(user_id):
+def update_person(user_id=None, name=None):
     data = request.get_json()
     if not data:
         return jsonify({"message": "Invalid data"}), 400
 
     select_query = "SELECT * FROM Users WHERE id = %s"
+    select_name = "SELECT * FROM Users where name= %s"
     cursor.execute(select_query, (user_id,))
+    cursor.execute(select_name, (name))
     existing_person = cursor.fetchone()
 
     if not existing_person:
