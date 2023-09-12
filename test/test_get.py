@@ -4,7 +4,7 @@ import requests
 url = 'http://localhost:5000/api/'
 
 # Replace with the user ID you want to retrieve
-user_id = 1  # Change this to the desired user ID
+user_id = "jared" # Change this to the desired user ID
 
 # Send a GET request to retrieve a person by user ID
 response = requests.get(url + str(user_id))

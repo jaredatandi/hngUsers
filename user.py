@@ -53,6 +53,8 @@ def get_person(user_id):
 # Endpoint to retrieve details of a person by name
 @app.route('/api/name/<string:name>', methods=['GET'])
 def get_person_by_name(name):
+    if not isinstance(name, str):
+        return jsonify({"Error": "name must be a string"}), 400
     select_query = "SELECT * FROM Users WHERE name = %s"
     cursor.execute(select_query, (name,))
     person = cursor.fetchone()
