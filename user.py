@@ -141,7 +141,7 @@ def delete_person(name_or_id):
         db.rollback()
         return jsonify({"message": "Failed to delete person", "error": str(e)}), 500
 
-# Ensure the database connection is closed after each request
+# Close the DB connections 
 @app.teardown_request
 def teardown_request(exception):
     cursor.close()
