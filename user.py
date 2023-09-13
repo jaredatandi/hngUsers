@@ -68,18 +68,26 @@ def get_person_by_name(name):
         return jsonify(person_data)
     return jsonify({"message": "Person not found"}), 404
 
-# Endpoint to update details of an existing person by user ID
-@app.route('/api/<string: name>', methods=['PUT'])
-@app.route('/api/<int:user_id>', methods=['PUT'])
-def update_person(user_id=None, name=None):
+@app.route('/api/<string:name_or_id>', methods=['PUT'])
+def update_person(name_or_id):
     data = request.get_json()
     if not data:
         return jsonify({"message": "Invalid data"}), 400
 
+    if name_or_id.isnumeric():
+        # If the name_or_id is numeric, assume it's a user_id
+        user_id = int(name_or_id)
+    else:
+        # Otherwise, assume it's a name and perform a query to get the user_id
+        select_query = "SELECT id FROM Users WHERE name = %s"
+        cursor.execute(select_query, (name_or_id,))
+        result = cursor.fetchone()
+        if not result:
+            return jsonify({"message": "Person not found"}), 404
+        user_id = result[0]
+
     select_query = "SELECT * FROM Users WHERE id = %s"
-    select_name = "SELECT * FROM Users where name= %s"
     cursor.execute(select_query, (user_id,))
-    cursor.execute(select_name, (name))
     existing_person = cursor.fetchone()
 
     if not existing_person:
@@ -102,9 +110,20 @@ def update_person(user_id=None, name=None):
         db.rollback()
         return jsonify({"message": "Failed to update person", "error": str(e)}), 500
 
-# Endpoint to remove a person by user ID
-@app.route('/api/<int:user_id>', methods=['DELETE'])
-def delete_person(user_id):
+@app.route('/api/<string:name_or_id>', methods=['DELETE'])
+def delete_person(name_or_id):
+    if name_or_id.isnumeric():
+        # If the name_or_id is numeric, assume it's a user_id
+        user_id = int(name_or_id)
+    else:
+        # Otherwise, assume it's a name and perform a query to get the user_id
+        select_query = "SELECT id FROM Users WHERE name = %s"
+        cursor.execute(select_query, (name_or_id,))
+        result = cursor.fetchone()
+        if not result:
+            return jsonify({"message": "Person not found"}), 404
+        user_id = result[0]
+
     select_query = "SELECT * FROM Users WHERE id = %s"
     cursor.execute(select_query, (user_id,))
     existing_person = cursor.fetchone()

@@ -6,8 +6,8 @@ url = 'http://localhost:5000/api'
 
 # Data for creating a new person
 data = {
-    "name": "JDoe",
-    "age": 85,
+    "name": "jane",
+    "age": 102,
     "email": "johndoe@example.com"
 }
 
